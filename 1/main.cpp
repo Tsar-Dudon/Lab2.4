@@ -164,7 +164,7 @@ class BigInt
 
 		bool operator!=(const BigInt& other)
 		{
-			if((*this > other) && (*this < other))
+			if((*this > other) || (*this < other))
 				return true;
 			return false;
 		}
@@ -195,6 +195,6 @@ int main()
 	BigInt y("999");
 	BigInt z;
 	z = x * y;
-	std::cout << z;
+	std::cout << (x==z);
 	return 0;
 }
