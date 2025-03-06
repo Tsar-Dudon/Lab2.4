@@ -32,41 +32,86 @@ class BigInt
 				m_value[i] = 0;
 		}
 
+		void aboba(const BigInt& other)
+		{
+			if(*this < abs(other))
+			{
+				BigInt tmp = *this;
+				for(short i = 0; i < other.m_size; i++)
+					m_value[i] = other.m_value[i];
+				for(short i = other.m_size; i < N_max; i++)
+					m_value[i] = 0;
+				m_size = other.m_size;
+				for(short i = 0; i < m_size; i++)
+				{
+					//std::cerr<< static_cast<short>(m_value[i]) << '*'<< static_cast<short>(other.m_value[i]) << std::endl;
+					m_value[i] -= tmp.m_value[i];
+					//std::cerr<< static_cast<short>(m_value[i]) << std::endl;
+					if(m_value[i] < 0)
+					{
+						m_value[i] += 10;
+						m_value[i+1] -= 1;
+					}
+				}
+				for(short i = m_size-1; i >= 0; i--)
+				{	
+					if(m_value[i] == 0)
+						m_size--;
+					else
+						break;
+				}
+				m_negative = true;
+
+
+			}	
+			else if(*this == abs(other))
+			{
+				*this = BigInt("0");
+			}
+			else
+			{
+				for(short i = 0; i < m_size; i++)
+				{
+					//std::cerr<< static_cast<short>(m_value[i]) << '*'<< static_cast<short>(other.m_value[i]) << std::endl;
+					m_value[i] -= other.m_value[i];
+					//std::cerr<< static_cast<short>(m_value[i]) << std::endl;
+					if(m_value[i] < 0)
+					{
+						m_value[i] += 10;
+						m_value[i+1] -= 1;
+					}
+				}
+				for(short i = m_size-1; i >= 0; i--)
+				{	
+					if(m_value[i] == 0)
+						m_size--;
+					else
+						break;
+				}
+			}
+		}
+
 		BigInt& operator+=(const BigInt& other)
 		{
 			if(!m_negative && other.m_negative)
 			{
-				if(*this < abs(other))
-				{
+				aboba(other);
+				return *this;
+			}
+			else if(m_negative && !other.m_negative)
+			{
+				m_negative = false;
+				BigInt tmp1("0");
+				for(short i = 0; i < other.m_size; i++)
+					tmp1.m_value[i] = other.m_value[i];
+				tmp1.m_size = other.m_size;
+				tmp1.m_negative = true;
+				aboba(tmp1);
+				if(abs(*this) > other)
 					m_negative = true;
-				}	
-				else if(*this == abs(other))
-				{
-					*this = BigInt("0");
-					return *this;
-				}
-				else
-				{
-					for(short i = 0; i < m_size; i++)
-					{
-						//std::cerr<< static_cast<short>(m_value[i]) << '*'<< static_cast<short>(other.m_value[i]) << std::endl;
-						m_value[i] -= other.m_value[i];
-						//std::cerr<< static_cast<short>(m_value[i]) << std::endl;
-						if(m_value[i] < 0)
-						{
-							m_value[i] += 10;
-							m_value[i+1] -= 1;
-						}
-					}
-					for(short i = m_size-1; i >= 0; i--)
-					{	
-						if(m_value[i] == 0)
-							m_size--;
-						else
-							break;
-					}
-					return *this;
-				}
+				else if(abs(*this) < other)
+					m_negative = false;
+				return *this;
 			}
 			else
 			{
@@ -309,9 +354,9 @@ std::ostream& operator<<(std::ostream& out, const BigInt& other)
 
 int main()
 {	
-	BigInt x("115");
-	BigInt y("-103");
-	x += y;
+	BigInt x("-2");
+	BigInt y("87709");
+	x *= y;
 	std::cout << x << std::endl;
 	return 0;
 }
